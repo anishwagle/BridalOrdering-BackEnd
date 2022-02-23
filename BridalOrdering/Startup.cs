@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using BridalOrdering.Middlewares;
 
 namespace BridalOrdering
 {
@@ -42,6 +43,7 @@ namespace BridalOrdering
                 options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             });
+            services.AddTransient<IJwtUtils, JwtUtils>();
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
 
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
@@ -74,7 +76,7 @@ namespace BridalOrdering
                 .AllowAnyHeader());
 
 
-            app.UseAuthorization();
+           app.UseMiddleware<JwtMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
