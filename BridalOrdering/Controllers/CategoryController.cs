@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BridalOrdering.Models;
 using BridalOrdering.Store;
+using BridalOrdering.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -31,7 +32,7 @@ namespace BridalOrdering.Controllers
             await _store.InsertOneAsync(model);
             return Ok(CreateSuccessResponse("Created successfully"));
         }
-
+        [Authorize]
         [HttpGet]
         [Route("get")]
         public async Task<IActionResult> GetAllAsync()

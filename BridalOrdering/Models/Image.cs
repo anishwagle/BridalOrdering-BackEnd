@@ -11,7 +11,7 @@ namespace BridalOrdering.Models
     public class Image : Document
     {
         public ImageType Type { get; set; }
-        public string Url { get; set; }
+        public string Img { get; set; }
         
     }
 
