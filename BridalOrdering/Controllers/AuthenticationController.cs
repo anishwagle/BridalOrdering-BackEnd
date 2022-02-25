@@ -76,7 +76,8 @@ namespace BridalOrdering.Controllers
             {
                 Id=Guid.NewGuid().ToString(),
                 Name = model.Name,
-                Email = model.Email
+                Email = model.Email,
+                UserType=UserType.USER
 
             };
 
