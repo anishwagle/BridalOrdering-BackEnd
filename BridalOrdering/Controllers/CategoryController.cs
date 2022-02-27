@@ -12,6 +12,7 @@ using  Newtonsoft.Json;
 
 namespace BridalOrdering.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class CategoryController : BaseApiController

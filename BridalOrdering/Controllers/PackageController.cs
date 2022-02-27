@@ -43,6 +43,8 @@ namespace BridalOrdering.Controllers
         [Route("get")]
         public async Task<IActionResult> GetAllAsync()
         {
+            var result= _store.FilterBy(x=>true);
+            var response = new List<PackageResponse>();
             foreach (var item in result)
             {
                 var package = new PackageResponse();
