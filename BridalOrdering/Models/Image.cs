@@ -6,7 +6,8 @@ namespace BridalOrdering.Models
 {
     public enum ImageType{
         Banner,
-        Thumbnail
+        Thumbnail,
+        Package
     }
     public class Image : Document
     {
