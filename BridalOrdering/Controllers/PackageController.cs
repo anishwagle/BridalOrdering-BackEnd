@@ -38,7 +38,7 @@ namespace BridalOrdering.Controllers
            await _store.InsertOneAsync(model);
             return Ok(CreateSuccessResponse("Created successfully"));
         }
-        [Authorize]
+       
         [HttpGet]
         [Route("get")]
         public async Task<IActionResult> GetAllAsync()

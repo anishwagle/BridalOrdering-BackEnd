@@ -9,6 +9,7 @@ namespace BridalOrdering.Models
         public string Name { get; set; }
         public string Image { get; set; }
         public List<string> Products { get; set; }
+        public float Price { get; set; }
     }
 
 }
