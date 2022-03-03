@@ -31,6 +31,7 @@ namespace BridalOrdering.Controllers
         [Route("add")]
         public async Task<IActionResult> AddAsync([FromBody]Package model)
         {
+            model.Id = Guid.NewGuid().ToString();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
