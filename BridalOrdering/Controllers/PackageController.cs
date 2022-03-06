@@ -52,6 +52,9 @@ namespace BridalOrdering.Controllers
                 package.Id = item.Id;
                 package.Name = item.Name;
                 package.Image = item.Image;
+                package.Price = item.Price;
+                package.Description = item.Description;
+
                 package.Products = new List<Product>();
                 foreach (var productId in item.Products)
                 {
@@ -73,6 +76,8 @@ namespace BridalOrdering.Controllers
              response.Id = result.Id;
             response.Image =  result.Image;
             response.Name = result.Name;
+            response.Price = result.Price;
+            response.Description = result.Description;
             response.Products = new List<Product>();
             foreach( var productId in result.Products){
                 var product = await _productStore.FindByIdAsync(productId);
