@@ -7,7 +7,7 @@ using BridalOrdering.Store;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using  Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace BridalOrdering.Controllers
 {
@@ -23,11 +23,15 @@ namespace BridalOrdering.Controllers
 
             _store = store;
         }
+        [Authorize]
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> AddAsync([FromBody]Carousel model)
+        public async Task<IActionResult> AddAsync([FromBody] Carousel model)
         {
-            model.Id =  Guid.NewGuid().ToString();
+            var userType = User.Claims.FirstOrDefault(x => x.Type == "userType").Value;
+            if (userType != UserType.ADMIN.ToString())
+                return new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            model.Id = Guid.NewGuid().ToString();
             await _store.InsertOneAsync(model);
             return Ok(CreateSuccessResponse("Created successfully"));
         }
@@ -36,8 +40,8 @@ namespace BridalOrdering.Controllers
         [Route("get")]
         public async Task<IActionResult> GetAllAsync()
         {
-            
-            var  result=  _store.FilterBy(x=>true);
+
+            var result = _store.FilterBy(x => true);
 
             return Ok(result);
         }
@@ -45,7 +49,7 @@ namespace BridalOrdering.Controllers
         // [Route("get/{carouselId}")]
         // public async Task<IActionResult> GetByIdAsync([FromRoute] string carouselId)
         // {
-            
+
         //     Carousel result=await _store.FindByIdAsync(carouselId);
         //     return Ok(result);
         // }
@@ -58,17 +62,21 @@ namespace BridalOrdering.Controllers
         //     await _store.ReplaceOneAsync(model);
         //     return Ok(CreateSuccessResponse("Carousel Updated"));
         // }
+        [Authorize]
         [HttpPost]
         [Route("delete/{carouselId}")]
         public async Task<IActionResult> Delete([FromRoute] string carouselId)
         {
-           
+            var userType = User.Claims.FirstOrDefault(x => x.Type == "userType").Value;
+            if (userType != UserType.ADMIN.ToString())
+                return new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+
             await _store.DeleteByIdAsync(carouselId);
             return Ok(CreateSuccessResponse("Carousel Deleted"));
         }
 
 
 
-       
+
     }
 }
