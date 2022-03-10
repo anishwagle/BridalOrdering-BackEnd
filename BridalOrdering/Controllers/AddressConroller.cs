@@ -15,31 +15,22 @@ namespace BridalOrdering.Controllers
     [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class OrderController : BaseApiController
+    public class AddressController : BaseApiController
     {
-        private readonly IStore<Order> _store;
-        private readonly IStore<Product> _productStore;
+        private readonly IStore<Address> _store;
 
         [JsonConstructorAttribute]
-        public OrderController(IStore<Order> store, IStore<Product> productStore)
+        public AddressController(IStore<Address> store)
         {
 
             _store = store;
-            _productStore=productStore;
         }
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> AddAsync([FromBody]Order model)
+        public async Task<IActionResult> AddAsync([FromBody]Address model)
         {
             model.Id =  Guid.NewGuid().ToString();
-           
             await _store.InsertOneAsync(model);
-            foreach(var product in model.Products){
-                product.Stock--;
-                await _productStore.ReplaceOneAsync(product);
-
-            }
-            
             return Ok(CreateSuccessResponse("Created successfully"));
         }
         [Authorize]
@@ -53,29 +44,29 @@ namespace BridalOrdering.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("get/{orderId}")]
-        public async Task<IActionResult> GetByIdAsync([FromRoute] string orderId)
+        [Route("get/{addressId}")]
+        public async Task<IActionResult> GetByIdAsync([FromRoute] string addressId)
         {
             
-            Order result=await _store.FindByIdAsync(orderId);
+            Address result=await _store.FindByIdAsync(addressId);
             return Ok(result);
         }
 
         [HttpPost]
-        [Route("update/{orderId}")]
-        public async Task<IActionResult> UpdateAsync([FromBody]Order model, [FromRoute] string orderId)
+        [Route("update/{addressId}")]
+        public async Task<IActionResult> UpdateAsync([FromBody]Address model, [FromRoute] string addressId)
         {
-            model.Id =  orderId;
+            model.Id =  addressId;
             await _store.ReplaceOneAsync(model);
-            return Ok(CreateSuccessResponse("Order Updated"));
+            return Ok(CreateSuccessResponse("Address Updated"));
         }
         [HttpPost]
-        [Route("delete/{orderId}")]
-        public async Task<IActionResult> Delete([FromRoute] string orderId)
+        [Route("delete/{addressId}")]
+        public async Task<IActionResult> Delete([FromRoute] string addressId)
         {
            
-            await _store.DeleteByIdAsync(orderId);
-            return Ok(CreateSuccessResponse("Order Deleted"));
+            await _store.DeleteByIdAsync(addressId);
+            return Ok(CreateSuccessResponse("Address Deleted"));
         }
 
 

@@ -13,6 +13,7 @@ namespace BridalOrdering.Models
         public List<Image> Images { get; set; }
         public string CategoryId { get; set; }
         public string PackageId { get; set; }
+        public int Stock { get; set; }
         
     }
 
