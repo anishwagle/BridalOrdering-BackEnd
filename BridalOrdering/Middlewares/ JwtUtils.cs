@@ -7,13 +7,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Collections.Generic;
 
 namespace BridalOrdering.Middlewares
 {
     public interface IJwtUtils
     {
-        public string GenerateToken(User user);
-        public string ValidateToken(string token);
+        public string GenerateToken(List<Claim> claims);
+        public JwtSecurityToken ValidateToken(string token);
     }
 
     public class JwtUtils : IJwtUtils
@@ -25,14 +26,14 @@ namespace BridalOrdering.Middlewares
             _appSettings = appSettings.Value;
         }
 
-        public string GenerateToken(User user)
+        public string GenerateToken(List<Claim> claims)
         {
             // generate token that is valid for 7 days
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id), new Claim("userType",user.UserType.ToString()) }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -40,7 +41,7 @@ namespace BridalOrdering.Middlewares
             return tokenHandler.WriteToken(token);
         }
 
-        public string ValidateToken(string token)
+        public JwtSecurityToken ValidateToken(string token)
         {
             if (token == null)
                 return null;
@@ -60,10 +61,10 @@ namespace BridalOrdering.Middlewares
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = jwtToken.Claims.First(x => x.Type == "id").Value;
+              //  var userId = jwtToken.Claims.First(x => x.Type == "sub").Value;
 
                 // return user id from JWT token if validation successful
-                return userId;
+                return jwtToken;
             }
             catch
             {

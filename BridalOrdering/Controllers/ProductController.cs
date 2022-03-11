@@ -30,9 +30,15 @@ namespace BridalOrdering.Controllers
         [Route("add")]
         public async Task<IActionResult> AddAsync([FromBody]Product model)
         {
+            try{
+
             var userType = User.Claims.FirstOrDefault(x => x.Type == "userType" ).Value;
-            if(userType!= UserType.ADMIN.ToString())
+             if(userType!= nameof(UserType.ADMIN))
                 return new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            }
+           catch(Exception e){
+               throw e;
+           }
 
             model.Id =  Guid.NewGuid().ToString();
             await _store.InsertOneAsync(model);
