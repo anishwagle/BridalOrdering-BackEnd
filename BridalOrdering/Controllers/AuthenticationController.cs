@@ -50,7 +50,11 @@ namespace BridalOrdering.Controllers
                 Email = user.Email
 
             };
-            response.JwtToken = _jwtUtils.GenerateToken(user);
+            response.JwtToken = _jwtUtils.GenerateToken(new List<System.Security.Claims.Claim> {
+
+                new System.Security.Claims.Claim("sub",user.Id),
+                new System.Security.Claims.Claim("userType",user.UserType.ToString())
+            });
 
             apiResponse.IsError=false;
             apiResponse.Message="Authentication Success";

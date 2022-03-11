@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BridalOrdering.Store;
 using BridalOrdering.Models;
+using System.Security.Claims;
 
 namespace BridalOrdering.Middlewares
 {
@@ -23,11 +24,16 @@ namespace BridalOrdering.Middlewares
         public async Task Invoke(HttpContext context, IStore<User> userService, IJwtUtils jwtUtils)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-            var userId = jwtUtils.ValidateToken(token);
-            if (userId != null)
+            var securityToken = jwtUtils.ValidateToken(token);
+            if (securityToken != null)
             {
+                 var defaultPrincipal = new ClaimsPrincipal(
+                        new ClaimsIdentity(securityToken.Claims));
                 // attach user to context on successful jwt validation
-                context.Items["User"] = await userService.FindByIdAsync(userId);
+                context.User = defaultPrincipal;
+                context.Items["User"] = await userService.FindByIdAsync(securityToken.Claims.First(x => x.Type == "sub").Value);
+                // // attach user to context on successful jwt validation
+                // context.Items["User"] = await userService.FindByIdAsync(userId);
             }
 
             await _next(context).ConfigureAwait(false);
