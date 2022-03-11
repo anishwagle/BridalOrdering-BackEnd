@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using  Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
+using BridalOrdering.Middlewares;
 
 namespace BridalOrdering.Controllers
 {
@@ -23,10 +25,15 @@ namespace BridalOrdering.Controllers
 
             _store = store;
         }
+        [Authorize]
         [HttpPost]
         [Route("add")]
         public async Task<IActionResult> AddAsync([FromBody]Product model)
         {
+            var userType = User.Claims.FirstOrDefault(x => x.Type == "userType" ).Value;
+            if(userType!= UserType.ADMIN.ToString())
+                return new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+
             model.Id =  Guid.NewGuid().ToString();
             await _store.InsertOneAsync(model);
             return Ok(CreateSuccessResponse("Created successfully"));
@@ -49,20 +56,29 @@ namespace BridalOrdering.Controllers
             Product result=await _store.FindByIdAsync(productId);
             return Ok(result);
         }
-
+        [Authorize]
         [HttpPost]
         [Route("update/{productId}")]
         public async Task<IActionResult> UpdateAsync([FromBody]Product model, [FromRoute] string productId)
         {
+            var userType = User.Claims.FirstOrDefault(x => x.Type == "userType" ).Value;
+            if(userType!= UserType.ADMIN.ToString())
+                return new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+
             model.Id =  productId;
             await _store.ReplaceOneAsync(model);
             return Ok(CreateSuccessResponse("Product Updated"));
         }
+
+        [Authorize]
         [HttpPost]
         [Route("delete/{productId}")]
         public async Task<IActionResult> Delete([FromRoute] string productId)
         {
-           
+            var userType = User.Claims.FirstOrDefault(x => x.Type == "userType" ).Value;
+            if(userType!= UserType.ADMIN.ToString())
+                return new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+
             await _store.DeleteByIdAsync(productId);
             return Ok(CreateSuccessResponse("Product Deleted"));
         }

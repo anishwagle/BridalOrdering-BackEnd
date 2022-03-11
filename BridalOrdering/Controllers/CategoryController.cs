@@ -8,11 +8,10 @@ using BridalOrdering.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using  Newtonsoft.Json;
-
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
 namespace BridalOrdering.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class CategoryController : BaseApiController
@@ -25,21 +24,24 @@ namespace BridalOrdering.Controllers
 
             _store = store;
         }
+        [Authorize]
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> AddAsync([FromBody]Category model)
+        public async Task<IActionResult> AddAsync([FromBody] Category model)
         {
-            model.Id =  Guid.NewGuid().ToString();
+            var userType = User.Claims.FirstOrDefault(x => x.Type == "userType").Value;
+            if (userType != UserType.ADMIN.ToString())
+                return new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            model.Id = Guid.NewGuid().ToString();
             await _store.InsertOneAsync(model);
             return Ok(CreateSuccessResponse("Created successfully"));
         }
-        
         [HttpGet]
         [Route("get")]
         public async Task<IActionResult> GetAllAsync()
         {
-            
-            var result= _store.FilterBy(x=>true);
+
+            var result = _store.FilterBy(x => true);
 
             return Ok(result);
         }
@@ -47,30 +49,37 @@ namespace BridalOrdering.Controllers
         [Route("get/{categoryId}")]
         public async Task<IActionResult> GetByIdAsync([FromRoute] string categoryId)
         {
-            
-            Category result=await _store.FindByIdAsync(categoryId);
+
+            Category result = await _store.FindByIdAsync(categoryId);
             return Ok(result);
         }
-
+        [Authorize]
         [HttpPost]
         [Route("update/{categoryId}")]
-        public async Task<IActionResult> UpdateAsync([FromBody]Category model, [FromRoute] string categoryId)
+        public async Task<IActionResult> UpdateAsync([FromBody] Category model, [FromRoute] string categoryId)
         {
-            model.Id =  categoryId;
+            var userType = User.Claims.FirstOrDefault(x => x.Type == "userType").Value;
+            if (userType != UserType.ADMIN.ToString())
+                return new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            model.Id = categoryId;
             await _store.ReplaceOneAsync(model);
             return Ok(CreateSuccessResponse("Category Updated"));
         }
+        [Authorize]
         [HttpPost]
         [Route("delete/{categoryId}")]
         public async Task<IActionResult> Delete([FromRoute] string categoryId)
         {
-           
+            var userType = User.Claims.FirstOrDefault(x => x.Type == "userType").Value;
+            if (userType != UserType.ADMIN.ToString())
+                return new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+
             await _store.DeleteByIdAsync(categoryId);
             return Ok(CreateSuccessResponse("Category Deleted"));
         }
 
 
 
-       
+
     }
 }
