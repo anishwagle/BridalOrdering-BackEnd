@@ -8,7 +8,7 @@ using BridalOrdering.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using  Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace BridalOrdering.Controllers
 {
@@ -28,11 +28,11 @@ namespace BridalOrdering.Controllers
         [Authorize]
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> AddAsync([FromBody]Address model)
+        public async Task<IActionResult> AddAsync([FromBody] Address model)
         {
-            var userId = User.Claims.FirstOrDefault(x => x.Type == "sub" ).Value;
-            model.Id =  Guid.NewGuid().ToString();
-            model.UserId=userId;
+            var userId = User.Claims.FirstOrDefault(x => x.Type == "sub").Value;
+            model.Id = Guid.NewGuid().ToString();
+            model.UserId = userId;
             await _store.InsertOneAsync(model);
             return Ok(CreateSuccessResponse("Created successfully"));
         }
@@ -41,8 +41,8 @@ namespace BridalOrdering.Controllers
         [Route("get")]
         public async Task<IActionResult> GetAllAsync()
         {
-            
-            var result= _store.FilterBy(x=>true);
+
+            var result = _store.FilterBy(x => true);
 
             return Ok(result);
         }
@@ -50,8 +50,8 @@ namespace BridalOrdering.Controllers
         [Route("get/{addressId}")]
         public async Task<IActionResult> GetByIdAsync([FromRoute] string addressId)
         {
-            
-            Address result=await _store.FindByIdAsync(addressId);
+
+            Address result = await _store.FindByIdAsync(addressId);
             return Ok(result);
         }
         [Authorize]
@@ -59,30 +59,30 @@ namespace BridalOrdering.Controllers
         [Route("getuseraddress")]
         public async Task<IActionResult> GetAddressByUserIdAsync()
         {
-            var userId = User.Claims.FirstOrDefault(x => x.Type == "sub" ).Value;
-           var result= _store.FilterBy(x=>x.UserId==userId);
+            var userId = User.Claims.FirstOrDefault(x => x.Type == "sub").Value;
+            var result = _store.FilterBy(x => x.UserId == userId);
             return Ok(result);
         }
-
+        [Authorize]
         [HttpPost]
         [Route("update/{addressId}")]
-        public async Task<IActionResult> UpdateAsync([FromBody]Address model, [FromRoute] string addressId)
+        public async Task<IActionResult> UpdateAsync([FromBody] Address model, [FromRoute] string addressId)
         {
-            model.Id =  addressId;
+            var userId = User.Claims.FirstOrDefault(x => x.Type == "sub").Value;
+            model.Id = addressId;
+            model.UserId = userId;
             await _store.ReplaceOneAsync(model);
             return Ok(CreateSuccessResponse("Address Updated"));
         }
+        [Authorize]
         [HttpPost]
         [Route("delete/{addressId}")]
         public async Task<IActionResult> Delete([FromRoute] string addressId)
         {
-           
+
             await _store.DeleteByIdAsync(addressId);
             return Ok(CreateSuccessResponse("Address Deleted"));
         }
 
-
-
-       
     }
 }
