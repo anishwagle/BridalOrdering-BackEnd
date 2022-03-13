@@ -34,9 +34,9 @@ namespace BridalOrdering.Controllers
             model.Id =  Guid.NewGuid().ToString();
            
             await _store.InsertOneAsync(model);
-            foreach(var product in model.Products){
-                product.Stock--;
-                await _productStore.ReplaceOneAsync(product);
+            foreach(var op in model.OrderedProducts){
+                op.Product.Stock-=op.Quantity;
+                await _productStore.ReplaceOneAsync(op.Product);
 
             }
             

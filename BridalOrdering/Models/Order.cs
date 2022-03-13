@@ -8,7 +8,7 @@ namespace BridalOrdering.Models
     {
         public string UserId { get; set; }
         public Address Address { get; set; }
-        public List<Product> Products { get; set; }
+        public List<OrderedProduct> OrderedProducts { get; set; }
     }
 
 }
