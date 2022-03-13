@@ -25,11 +25,14 @@ namespace BridalOrdering.Controllers
 
             _store = store;
         }
+        [Authorize]
         [HttpPost]
         [Route("add")]
         public async Task<IActionResult> AddAsync([FromBody]Address model)
         {
+            var userId = User.Claims.FirstOrDefault(x => x.Type == "sub" ).Value;
             model.Id =  Guid.NewGuid().ToString();
+            model.UserId=userId;
             await _store.InsertOneAsync(model);
             return Ok(CreateSuccessResponse("Created successfully"));
         }
@@ -51,12 +54,12 @@ namespace BridalOrdering.Controllers
             Address result=await _store.FindByIdAsync(addressId);
             return Ok(result);
         }
-
+        [Authorize]
         [HttpGet]
-        [Route("getbyuserid/{userId}")]
-        public async Task<IActionResult> GetAddressByUserIdAsync([FromRoute] string userId)
+        [Route("getuseraddress")]
+        public async Task<IActionResult> GetAddressByUserIdAsync()
         {
-            
+            var userId = User.Claims.FirstOrDefault(x => x.Type == "sub" ).Value;
            var result= _store.FilterBy(x=>x.UserId==userId);
             return Ok(result);
         }
