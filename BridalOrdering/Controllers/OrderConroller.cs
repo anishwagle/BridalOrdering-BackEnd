@@ -8,7 +8,7 @@ using BridalOrdering.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using  Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace BridalOrdering.Controllers
 {
@@ -25,47 +25,59 @@ namespace BridalOrdering.Controllers
         {
 
             _store = store;
-            _productStore=productStore;
+            _productStore = productStore;
         }
         [HttpPost]
         [Route("add")]
-        public async Task<IActionResult> AddAsync([FromBody]Order model)
+        public async Task<IActionResult> AddAsync([FromBody] Order model)
         {
-            model.Id =  Guid.NewGuid().ToString();
-           
+            model.Id = Guid.NewGuid().ToString();
+
             await _store.InsertOneAsync(model);
-            foreach(var op in model.OrderedProducts){
-                op.Product.Stock-=op.Quantity;
+            foreach (var op in model.OrderedProducts)
+            {
+                op.Product.Stock -= op.Quantity;
                 await _productStore.ReplaceOneAsync(op.Product);
 
             }
-            
+
             return Ok(CreateSuccessResponse("Created successfully"));
         }
         [Authorize]
         [HttpGet]
         [Route("get")]
-        public async Task<IActionResult> GetAllAsync()
+        public IActionResult GetAll()
         {
-            
-            var result= _store.FilterBy(x=>true);
 
+            var result = _store.FilterBy(x => true);
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("userorders/{userId}")]
+        public  IActionResult GetOrderByUserId([FromRoute] string userId)
+        {
+
+            var result = _store.FilterBy(x => x.UserId == userId);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/{orderId}")]
         public async Task<IActionResult> GetByIdAsync([FromRoute] string orderId)
         {
-            
-            Order result=await _store.FindByIdAsync(orderId);
+
+            Order result = await _store.FindByIdAsync(orderId);
             return Ok(result);
         }
 
+
+
         [HttpPost]
         [Route("update/{orderId}")]
-        public async Task<IActionResult> UpdateAsync([FromBody]Order model, [FromRoute] string orderId)
+        public async Task<IActionResult> UpdateAsync([FromBody] Order model, [FromRoute] string orderId)
         {
-            model.Id =  orderId;
+            model.Id = orderId;
             await _store.ReplaceOneAsync(model);
             return Ok(CreateSuccessResponse("Order Updated"));
         }
@@ -73,13 +85,13 @@ namespace BridalOrdering.Controllers
         [Route("delete/{orderId}")]
         public async Task<IActionResult> Delete([FromRoute] string orderId)
         {
-           
+
             await _store.DeleteByIdAsync(orderId);
             return Ok(CreateSuccessResponse("Order Deleted"));
         }
 
 
 
-       
+
     }
 }
