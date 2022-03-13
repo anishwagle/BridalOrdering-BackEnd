@@ -52,6 +52,15 @@ namespace BridalOrdering.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        [Route("getbyuserid/{userId}")]
+        public async Task<IActionResult> GetRatingByProductIdAsync([FromRoute] string userId)
+        {
+            
+           var result= _store.FilterBy(x=>x.UserId==userId);
+            return Ok(result);
+        }
+
         [HttpPost]
         [Route("update/{addressId}")]
         public async Task<IActionResult> UpdateAsync([FromBody]Address model, [FromRoute] string addressId)
