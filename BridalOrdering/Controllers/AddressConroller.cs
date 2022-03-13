@@ -54,7 +54,7 @@ namespace BridalOrdering.Controllers
 
         [HttpGet]
         [Route("getbyuserid/{userId}")]
-        public async Task<IActionResult> GetRatingByProductIdAsync([FromRoute] string userId)
+        public async Task<IActionResult> GetAddressByUserIdAsync([FromRoute] string userId)
         {
             
            var result= _store.FilterBy(x=>x.UserId==userId);
