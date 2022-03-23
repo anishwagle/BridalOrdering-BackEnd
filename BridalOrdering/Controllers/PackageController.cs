@@ -63,6 +63,7 @@ namespace BridalOrdering.Controllers
                 foreach (var productId in item.Products)
                 {
                     var product = await _productStore.FindByIdAsync(productId);
+                    if(product!=null)
                     package.Products.Add(product);
                 }
                 response.Add(package);
