@@ -102,6 +102,8 @@ namespace BridalOrdering.Controllers
             result.Name = model.Name;
             result.Image = model.Image;
             result.Products = model.Products;
+            result.Price=model.Price;
+            result.Description=model.Description;
             await _store.ReplaceOneAsync(result);
             return Ok(CreateSuccessResponse("Updated successfully"));
 
