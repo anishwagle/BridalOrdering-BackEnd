@@ -16,6 +16,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using BridalOrdering.Middlewares;
+using BridalOrdering.Services;
+
 
 namespace BridalOrdering
 {
@@ -49,6 +51,7 @@ namespace BridalOrdering
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             services.AddScoped(typeof(IStore<>), typeof(Store<>));
             services.AddTransient<IAppSettings, AppSettings>();
+            services.AddScoped<KhaltiService>();
 
 
             services.AddSwaggerGen(c =>
